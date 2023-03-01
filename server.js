@@ -12,6 +12,15 @@ const app = express();
 
 app.use(express.static("./build", { index: false })); // to not load index.html from folder
 
+const articles = [
+  { title: "article 1", author: "Bob" }
+]
+
+app.get('/api/articles', (req, res) => {
+  const loadedArticles = articles;
+  res.json(loadedArticles);
+});
+
 app.get("/*", (req, res) => {
   const sheet = new ServerStyleSheet();
 
@@ -27,9 +36,12 @@ app.get("/*", (req, res) => {
       return res.status(500).send(err);
     }
 
+    const loadedArticles = articles;
+     
+
     return res.send(
       data
-        .replace('<div id="root"></div>', `<div id="root">${reactApp}</div>`)
+        .replace('<div id="root"></div>', `<script>window.preloadedArticles = ${JSON.stringify(loadedArticles)} </script> <div id="root">${reactApp}</div>`)
         .replace("{{styles}}", sheet.getStyleTags())
     );
   });
